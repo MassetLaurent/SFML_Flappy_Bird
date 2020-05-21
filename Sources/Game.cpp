@@ -1,60 +1,49 @@
+#include <stdlib.h>
+#include <time.h>
+
 #include "Game.h"
+#include "SplashState.h"
 
-#define SCREEN_HEIGHT 1024
-#define SCREEN_WIDTH 1024
 
-void Game::initWindow()
+Game::Game(float width, float height, std::string title)
 {
-	this->window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "SFML Flappy Bird");
-}
-
-Game::Game()
-{
-	this->initWindow();
-}
-
-Game::~Game()
-{
-
+	srand(time(NULL));
+	
+	this->_data->window.create(sf::VideoMode(width, height), title, sf::Style::Close | sf::Style::Titlebar);
+	
+	//adding the splashstate in the stack of stateMachine (the first state of the game)
+	this->_data->stateMachine.addState(StateRef(new SplashState(this->_data)));
+	this->run();
 }
 
 void Game::run()
 {
-	while (this->window->isOpen())
+	float newTime, frameTime, interpolation;
+	float currentTime = this->clock.getElapsedTime().asSeconds();
+	float accumulator = 0.f;
+
+	while (_data->window.isOpen())
 	{
-		this->updatePollEvent();
+		this->_data->stateMachine.processStateChanges();
 
-		this->update();
+		newTime = this->clock.getElapsedTime().asSeconds();
+		frameTime = newTime - currentTime;
 
-		this->render();
+		if (frameTime > 0.25f)
+			frameTime = 0.25f;
+
+		currentTime = newTime;
+		accumulator += frameTime;
+
+		while (accumulator >= dt)
+		{
+			this->_data->stateMachine.getActiveState()->handleInput();
+			this->_data->stateMachine.getActiveState()->update(dt);
+
+			accumulator -= dt;
+		}
+
+		interpolation = accumulator / dt;
+		this->_data->stateMachine.getActiveState()->render(interpolation);
 	}
 }
-
-void Game::update()
-{
-
-}
-
-void Game::updatePollEvent()
-{
-	sf::Event ev;
-
-	while (this->window->pollEvent(ev))
-	{
-		if (ev.Event::type == sf::Event::Closed)
-			this->window->close();
-
-		if (ev.Event::KeyPressed && ev.key.code == sf::Keyboard::Escape)
-			this->window->close();
-	}
-}
-
-void Game::render()
-{
-	this->window->clear();
-
-
-
-	this->window->display();
-}
-

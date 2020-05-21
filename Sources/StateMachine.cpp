@@ -18,6 +18,7 @@ void StateMachine::processStateChanges()
 	if (this->isRemoving && !this->statesStack.empty())
 	{
 		this->statesStack.pop();
+
 		if (!this->statesStack.empty())
 			this->statesStack.top()->resume();
 

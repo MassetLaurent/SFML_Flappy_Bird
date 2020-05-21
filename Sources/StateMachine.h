@@ -6,9 +6,7 @@
 
 #include "State.h"
 
-
 typedef std::unique_ptr<State> StateRef;
-
 
 class StateMachine
 {
@@ -23,16 +21,15 @@ private:
 public:
 	//constructors
 	StateMachine() {}
-	virtual ~StateMachine() {}
+	~StateMachine() {}
 
 	//methodes
 	void addState(StateRef _newState, bool _isReplacing = true);
 	void removeState();
+
 	void processStateChanges();
+
 	StateRef &getActiveState();
-
-
-
 };
 
 #endif // !DEF_STATEMACHINE

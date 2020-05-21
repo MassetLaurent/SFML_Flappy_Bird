@@ -2,32 +2,39 @@
 #define DEF_GAME
 
 #include <iostream>
+#include <memory>
+#include <string>
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
+
+#include "StateMachine.h"
+#include "AssetManager.h"
+#include "InputManager.h"
+
+struct GameData
+{
+	StateMachine stateMachine;
+	sf::RenderWindow window;
+	AssetManager assetManager;
+	InputManager inputManager;
+};
+
+typedef std::shared_ptr<GameData> GameDataRef;
 
 class Game
 {
 private:
 	//attributes
-	sf::RenderWindow* window;
-	void initWindow();
-
+	const float dt = 1.f / 60.f;
+	sf::Clock clock;
+	GameDataRef _data = std::make_shared<GameData>();
 
 public:
 	//constructors
-	Game();
-	virtual ~Game();
+	Game(float width, float height, std::string title);
 
 	//methodes
 	void run();
-	void updatePollEvent();
-
-
-	void update();
-	void render();
 };
+
 #endif //! DEF_GAME
